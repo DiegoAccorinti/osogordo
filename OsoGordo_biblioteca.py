@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import pilas
 
-#global puntos
-
 # Permite que este ejemplo funcion incluso si no has instalado pilas.
 import sys
 import random
@@ -14,27 +12,20 @@ from chat import *
 # Cargo el último estado guardado
 from savegame import *
 
-from OsoGordo_banio import EscenaBanio
-from OsoGordo_biblioteca import EscenaBiblioteca
+class EscenaBiblioteca(pilas.escena.Base):
 
-
-
-class EscenaDespensa(pilas.escena.Base):
 
 	def iniciar(self):
 
 		#Cargo los datos guardados en disco para sincronizar los valores.
-		alegria, salud, comida, puntos = leerValores()	
+		alegria, salud, comida, puntos = leerValores()		
 
 		# HORARIO
 		""" chequeo qué hora es para poner al oso gordo a dormir o no """
 		ahora = datetime.datetime.now()
-		"""for attr in [ 'year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond']:
-			print attr, ':', getattr(d, attr)"""
-
 
 		# Creo el fondo
-		fondo = pilas.imagenes.cargar('pics/fondo.png')
+		fondo = pilas.imagenes.cargar('pics/fondo_biblioteca.png')
 		actorFondo = pilas.actores.Actor(fondo)
 		actorFondo.z = 1000
 
@@ -43,7 +34,6 @@ class EscenaDespensa(pilas.escena.Base):
 		titulo_puntos = pilas.actores.Texto("puntos", magnitud=20, fuente="fuentes/fuente.ttf", y=280, x=470)
 		texto_puntos = pilas.actores.Texto(str(puntos), magnitud=40, fuente="fuentes/fuente.ttf", y=240, x=440)
 		#Barras
-		print type(alegria)
 		barra_alegria = pilas.actores.Energia(progreso = int(alegria), color_relleno = pilas.colores.Color(56,255,75),
 		ancho=160, alto=25, con_sombra = False, con_brillo = False)
 		barra_alegria.rotacion = -90
@@ -72,27 +62,28 @@ class EscenaDespensa(pilas.escena.Base):
 		icono_limpieza.escala = pilas.interpolar([1, 1.5, 1,1.2,1], 1, demora = 2)
 
 		#cartel habitacion
-		img_cartel = pilas.imagenes.cargar('pics/cartel_despensa.png')
+		img_cartel = pilas.imagenes.cargar('pics/cartel_biblioteca.png')
 		cartel = pilas.actores.Actor(img_cartel, x=360, y=-244)
 
 		#cambiar de habitacion
-		botonIzq = pilas.actores.Boton(ruta_normal = 'pics/cursorIzq.png', ruta_over = 'pics/cursorIzq_over.png', x= 250, y=-244)
+		botonIzq = pilas.actores.Boton(ruta_normal = 'pics/cursorIzq.png', ruta_over = 'pics/cursorIzq_over.png', x=250, y=-244)
 
 		def cuando_pulsan_el_boton():
-			pilas.almacenar_escena(EscenaBanio())
+			from OsoGordo import EscenaDespensa
+			pilas.cambiar_escena(EscenaDespensa())
 		def cuando_pasa_sobre_el_boton():
 			botonIzq.pintar_sobre()
 		def cuando_deja_de_pulsar():
 			botonIzq.pintar_normal()
 
-		botonDer = pilas.actores.Boton(ruta_normal = 'pics/cursorDer.png', ruta_over = 'pics/cursorDer_over.png', x= 470, y=-244)
+		"""botonDer = pilas.actores.Boton(ruta_normal = 'pics/cursorDer.png', ruta_over = 'pics/cursorDer_over.png', x=470, y=-244)
 
 		def cuando_pulsan_el_boton_der():
-			pilas.almacenar_escena(EscenaBiblioteca())
+			pilas.cambiar_escena(EscenaBanio())
 		def cuando_pasa_sobre_el_boton_der():
 			botonDer.pintar_sobre()
 		def cuando_deja_de_pulsar_der():
-			botonDer.pintar_normal()
+			botonDer.pintar_normal()"""
 
 		# EL OSO
 
@@ -100,10 +91,6 @@ class EscenaDespensa(pilas.escena.Base):
 			""" Si son entre las 2 de la tarde y las 4, el oso duerme la siesta.
 				A las doce de la noche se duerme hasta las 9 de la mañana."""
 
-			grilla = pilas.imagenes.cargar_grilla("pics/durmiendo/durmiendo.png", 2)
-			oso = pilas.actores.Animacion(grilla, True, velocidad = 0.65)
-			snd_ronquidos = pilas.sonidos.cargar("sonidos/ronquidos2.ogg")
-			snd_ronquidos.reproducir(repetir=True)
 		else:
 
 			imagenOso = pilas.imagenes.cargar("pics/osoGordo_original.png")
@@ -117,54 +104,55 @@ class EscenaDespensa(pilas.escena.Base):
 			rostro = pilas.actores.Actor(img_rostro, x=20, y=500)
 			rostro.y = [78],0.5
 			rostro.y = 78
+
 			#el fondo se sacude al caer
 			actorFondo.x = pilas.interpolar([10, -10, 5, 0], 0.2, demora = 0.5)
 			actorFondo.y = pilas.interpolar([30, -40, 20, 0], 0.2, demora = 0.5)
 			oso.y = pilas.interpolar([45,35], 0.15, demora = 0.5)
 			rostro.y = pilas.interpolar([100,78], 0.15, demora = 0.5)
 
+			# Creamos los elementos
+			img_disquettes = pilas.imagenes.cargar("pics/disquettes.png")
+			disquettes = pilas.actores.Actor(img_disquettes, x=-450, y=-235)
+			disquettes.aprender(pilas.habilidades.Arrastrable)
+			disquettes.sonido = 'sonidos/larry.ogg'
+			disquettes.alegria = 9
+			disquettes.decirAlUsar = ['Mi primera PC fue una 386 con dos megabytes de RAM.',u'¿jugaste alguna vez a "The Secret of Monkey Island" ?', u'¿No sabés dónde está Carmen San Diego?']
 
-			# Creamos las bananas
-			img_banana = pilas.imagenes.cargar("pics/banana.png")
-			banana = pilas.actores.Actor(img_banana, x = -450, y = -245)
-			banana.aprender(pilas.habilidades.Arrastrable)
-			banana.sonido = ['sonidos/mordisco_01.ogg', 'sonidos/mordisco_02.ogg', 'sonidos/mordisco_03.ogg']
-			banana.calorias = 15
-			banana.loqueensucia = 10
-			banana.decirAlUsar = [u'mmmm  con dulce de leche quedaría muy bien',u'¡falta la crema!', 'Banana nou ten carozo.']
+			img_joystick = pilas.imagenes.cargar("pics/atari2600.png")
+			joystick = pilas.actores.Actor(img_joystick, x=-350, y=-235)
+			joystick.aprender(pilas.habilidades.Arrastrable)
+			joystick.sonido = 'sonidos/atari.ogg'
+			joystick.alegria = 10
+			joystick.decirAlUsar = [u'¿Cómo saco al ET del pozo?']
 
-			# Creamos la zanahoria
-			img_zanahoria = pilas.imagenes.cargar("pics/zanahoria.png")
-			zanahoria = pilas.actores.Actor(img_zanahoria, x = -350, y = -245)
-			zanahoria.aprender(pilas.habilidades.Arrastrable)
-			zanahoria.sonido = ['sonidos/mordisco_01.ogg', 'sonidos/mordisco_02.ogg', 'sonidos/mordisco_03.ogg']
-			zanahoria.calorias = 13
-			zanahoria.loqueensucia = 7
-			zanahoria.decirAlUsar = [u'Muy rica la ensalada..  ¿y el bife cuándo llega?', u'La zanahoria hace bien a la vista. Los choripanes también.']
+			img_commodore = pilas.imagenes.cargar("pics/commodore.png")
+			commodore = pilas.actores.Actor(img_commodore, x=-250, y=-235)
+			commodore.aprender(pilas.habilidades.Arrastrable)
+			commodore.sonido = ['sonidos/commodore_01.ogg', 'sonidos/commodore_02.ogg', 'sonidos/commodore_03.ogg']
+			commodore.alegria = 14
+			commodore.decirAlUsar = ['LOAD "*",8','POKE 53280,1','READY.', u'Cuando sea grande quiero ser como Zak Mckracken.']
 
-			# Creamos la hamburguesa
-			img_hamburguesa = pilas.imagenes.cargar("pics/hamburguesa.png")
-			hamburguesa = pilas.actores.Actor(img_hamburguesa, x = -250, y = -245)
-			hamburguesa.aprender(pilas.habilidades.Arrastrable)
-			hamburguesa.sonido = ['sonidos/mordisco_01.ogg', 'sonidos/mordisco_02.ogg', 'sonidos/mordisco_03.ogg']
-			hamburguesa.calorias = 45
-			hamburguesa.loqueensucia = 12
-			hamburguesa.decirAlUsar = [u'Tremenda Cangreburguer', u'¿Tiene morrón?', u'mmmmm  ¡con mayonesa!', 'Con la comida no se jode, eh.', 'Hola, vine a comer comida.', u'mmmm y después chimichanga.']
+			img_cd = pilas.imagenes.cargar("pics/CD.png")
+			cd = pilas.actores.Actor(img_cd, x=-150, y=-235)
+			cd.aprender(pilas.habilidades.Arrastrable)
+			cd.sonido = 'sonidos/libro.ogg'
+			cd.alegria = 7
+			cd.decirAlUsar = [u'Llegando los monos - SUMO', u'El león - Los fabulosos Cadillacs', u'El Amor Después Del Amor - Fito Páez', u'Piano Bar - Charly García', u'Pappo\'s Blues Volumen 2 - Pappo\'s Blues', u'Alta Suciedad - Andrés Calamaro', u'Canción Animal - Soda Stereo', u'La Era De La Boludez - Divididos', u'Oktubre - Patricio Rey y Sus Redonditos de Ricota', u'Artaud - Pescado Rabioso', u'Despedazado por mil partes - La Renga', u'Tercer Arco - Los Piojos', u'Angeles Caidos - Attaque 77', u'Hermética - Ácido Argentino',  u'El Exceso - Flema', u'Valentín Alsina - Dos Minutos', u'Ahí Vamos - Gustavo Cerati', u'La Mosca y la Sopa - Patricio Rey y Sus Redonditos de Ricota']
 
-			# Creamos el helado
-			img_helado = pilas.imagenes.cargar("pics/helado.png")
-			helado = pilas.actores.Actor(img_helado, x = -150, y = -245)
-			helado.aprender(pilas.habilidades.Arrastrable)
-			helado.sonido = ['sonidos/mordisco_01.ogg', 'sonidos/mordisco_02.ogg', 'sonidos/mordisco_03.ogg']
-			helado.calorias = 30
-			helado.loqueensucia = 20
-			helado.decirAlUsar = [u'Lo quiero todo de limón.', u'Super dulce de leche bañado en dulce de leche, por favor...', u'La crema del cielo es crema americana con colorante.', u'Jamás subestimes un gusto, yo pido Vainilla.', u'¿Frutos del bosque? mmmmmm.', u'Me comí el vacito. Era de telgopor.', u'El helado no lo comparto.']
-
-			elementos = [banana, zanahoria, hamburguesa, helado]
+			img_libro = pilas.imagenes.cargar("pics/libro.png")
+			libro = pilas.actores.Actor(img_libro, x=-50, y=-235)
+			libro.aprender(pilas.habilidades.Arrastrable)
+			libro.sonido = 'sonidos/libro.ogg'
+			libro.alegria = 9
+			libro.decirAlUsar = [u'Obras Completas - Edgar Allan Poe','Obras Completas - Oscar Wilde', u'Sobre héroes y tumbas - Ernesto Sabato', 'Odisea - Homero','El Hobbit - J.R.Tolkien','Viaje al centro de la tierra - Julio Verne',u'Parque Jurásico - Michael Crichton', 'El viejo y el mar - Ernest Hemingway', u'El túnel - Ernesto Sabato', u'El señor de los anillos - J.R.Tolkien', u'Rayuela - Julio Cortazar', u'Don Quijote de la Mancha - Miguel de Cervantes', u'Poema de Gilgamesh - Anónimo', u'Las mil y una noches - Anónimo', u'Crimen y castigo - Fiódor Dostoievski', u'Cien años de soledad - Gabriel García Márquez', u'El castillo - Franz Kafka', u'1984 - George Orwell', u'El tambor de hojalata - Gunter Grass', u'El Aleph - Jorge Luis Borges']
 
 
-			def comer_comida(oso, elemento):
+			elementos = [disquettes, joystick, commodore, cd, libro]
 
+
+			def divertir(oso, elemento):
+				
 				#sonido
 				# Si el elemento tiene un sonido único, elemento.sonido será una cadena. Sino, será una lista de la cual elijo un elemento al azar.
 				if type(elemento.sonido) == str:
@@ -172,39 +160,33 @@ class EscenaDespensa(pilas.escena.Base):
 				else:
 					sonido = pilas.sonidos.cargar(random.choice(elemento.sonido))
 				sonido.reproducir()
-
+			
 				elemento.eliminar()
+				barra_alegria.progreso = [barra_alegria.progreso + elemento.alegria]
+				barra_comida.progreso = [barra_comida.progreso - 6]
 
-
-				masticando = pilas.imagenes.cargar_grilla("pics/rostros/masticando.png", 10)
-				rostro.transparencia = 100
-				boca = pilas.actores.Animacion(masticando, False, x = 45, y = 94)
-				rostro.transparencia = pilas.interpolar(0, 0.01, demora = 0.92)
-
-				barra_comida.progreso = [barra_comida.progreso + elemento.calorias]
-				barra_salud.progreso = [barra_salud.progreso - elemento.loqueensucia]
-
+			
 				chat(random.choice(elemento.decirAlUsar), 4)
 
+				#Actualizo el puntaje
 				global puntos
 				puntos += 10
 				texto_puntos.texto = str(puntos)
 
-				#actualizo los valores en disco
-				actualizarValores(barra_alegria.progreso, barra_salud.progreso - elemento.loqueensucia, barra_comida.progreso + elemento.calorias, str(puntos))
+				#actualizo los datos en disco
+				actualizarValores(barra_alegria.progreso + elemento.alegria, barra_salud.progreso, barra_comida.progreso - 6, puntos)
 
-			pilas.mundo.colisiones.agregar(oso, elementos, comer_comida)
-
+			pilas.mundo.colisiones.agregar(oso, elementos, divertir)
 		#Control de habitaciones
 		botonIzq.conectar_presionado(cuando_pulsan_el_boton)
 		botonIzq.conectar_sobre(cuando_pasa_sobre_el_boton)
 		botonIzq.conectar_normal(cuando_deja_de_pulsar)
-		botonDer.conectar_presionado(cuando_pulsan_el_boton_der)
+		"""botonDer.conectar_presionado(cuando_pulsan_el_boton_der)
 		botonDer.conectar_sobre(cuando_pasa_sobre_el_boton_der)
-		botonDer.conectar_normal(cuando_deja_de_pulsar_der)
+		botonDer.conectar_normal(cuando_deja_de_pulsar_der)"""
 
 # Para que ande igual si solo ejecuto solo esta escena
 if __name__ == "__main__":
 	pilas.iniciar(ancho=1024, alto=600)
-	pilas.cambiar_escena(EscenaDespensa())
+	pilas.cambiar_escena(EscenaBiblioteca())
 	pilas.ejecutar()
